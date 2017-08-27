@@ -24,28 +24,22 @@ export const color = (...args) => {
 };
 
 export class Background extends Component {
-	/**
-	 * @param {{}} props
-	 * @param {HTMLCanvasElement} $canvas
-	 */
-	static draw(props, $canvas) {
-		const { color } = props;
+	render() {
+		const { props: { color, $canvas } } = this;
 		const { width, height } = $canvas;
 		const context = $canvas.getContext('2d');
 
 		context.fillStyle = color;
 		context.fillRect(0, 0, width, height);
+
+		return null;
 	}
 }
 
 export class Ellipse extends Component {
-	/**
-	 * @param {{}} props
-	 * @param {HTMLCanvasElement} $canvas
-	 */
-	static draw(props, $canvas) {
+	render() {
+		const { props: { x, y, width, height, fill, stroke, mode, strokeWeight, $canvas } } = this;
 		const context = $canvas.getContext('2d');
-		const { x, y, width, height, fill, stroke, mode, strokeWeight } = props;
 		const { CORNER, CORNERS, RADIUS } = Ellipse;
 		let cx = x;
 		let cy = y;
@@ -81,6 +75,8 @@ export class Ellipse extends Component {
 		context.fill();
 		context.stroke();
 		context.closePath();
+
+		return null;
 	}
 
 	static get defaultProps() {
@@ -122,16 +118,12 @@ export class Sketch extends Component {
 	render() {
 		const { props: { width, height, children, onMouseDown, onMouseMove, onMouseUp }, $canvas } = this;
 
-		if ($canvas) {
-			Children.map(children, (child) => {
-				child.type.draw(child.props, $canvas);
-			});
-		}
-
 		return (
 			<canvas width={width} height={height} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} style={{
 				backgroundColor: color(204)
-			}} />
+			}}>
+				{$canvas ? Children.map(children, (child) => cloneElement(child, { $canvas })) : null}
+			</canvas>
 		);
 	}
 
