@@ -139,14 +139,12 @@ export class Processing extends Component {
 	constructor() {
 		super();
 
-		this.state = {
-			pmouseX: 0,
-			pmouseY: 0,
-			mouseX: 0,
-			mouseY: 0,
-			frameCount: 0,
-			mousePressed: false
-		};
+		this.pmouseX = 0;
+		this.pmouseY = 0;
+		this.mouseX = 0;
+		this.mouseY = 0;
+		this.frameCount = 0;
+		this.isMousePressed = false;
 	}
 
 	componentDidMount() {
@@ -158,6 +156,8 @@ export class Processing extends Component {
 	}
 
 	render() {
+		this.frameCount += 1;
+
 		return cloneElement(
 			this.draw(),
 			{
@@ -170,22 +170,18 @@ export class Processing extends Component {
 
 	@autobind
 	_frame() {
-		const { state: { frameCount } } = this;
-
-		this.setState({ frameCount: frameCount + 1 }, () => {
-			setTimeout(this._frame, 1);
-		});
+		this.forceUpdate(() => setTimeout(this._frame, 1));
 	}
 
 	@autobind
 	_onMouseDown() {
-		this.setState({ mousePressed: true });
+		this.isMousePressed = true;
 		this._execf('mousePressed');
 	}
 
 	@autobind
 	_onMouseUp() {
-		this.setState({ mousePressed: false });
+		this.isMousePressed = false;
 		this._execf('mouseReleased');
 	}
 
@@ -194,17 +190,15 @@ export class Processing extends Component {
 	 */
 	@autobind
 	_onMouseMove(e) {
-		const { state: { mouseX, mouseY } } = this;
+		const { mouseX, mouseY } = this;
 		const { clientX, clientY, currentTarget } = e;
 		const { left, top } = currentTarget.getBoundingClientRect();
 
+		this.pmouseX = mouseX;
+		this.pmouseY = mouseY;
+		this.mouseX = clientX - left;
+		this.mouseY = clientY - top;
 		this._execf('mouseMoved');
-		this.setState({
-			pmouseX: mouseX,
-			pmouseY: mouseY,
-			mouseX: clientX - left,
-			mouseY: clientY - top
-		});
 	}
 
 	/**
