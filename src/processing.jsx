@@ -23,6 +23,27 @@ export const color = (...args) => {
 	}
 };
 
+export class Line extends Component {
+	render() {
+		const { props: { x1, y1, x2, y2, stroke, strokeWeight, $canvas } } = this;
+		const context = $canvas.getContext('2d');
+
+		context.beginPath();
+		if (typeof stroke === 'string') {
+			context.strokeStyle = stroke;
+		}
+		if (typeof strokeWeight === 'number') {
+			context.lineWidth = strokeWeight;
+		}
+		context.moveTo(x1, y1);
+		context.lineTo(x2, y2);
+		context.stroke();
+		context.closePath();
+
+		return null;
+	}
+}
+
 export class Background extends Component {
 	render() {
 		const { props: { color, $canvas } } = this;
@@ -139,16 +160,23 @@ export class Processing extends Component {
 	constructor() {
 		super();
 
+		this.width = 0;
+		this.height = 0;
 		this.pmouseX = 0;
 		this.pmouseY = 0;
 		this.mouseX = 0;
 		this.mouseY = 0;
 		this.frameCount = 0;
 		this.isMousePressed = false;
+		this._canLoop = true;
 	}
 
 	componentDidMount() {
-		this._frame();
+		this._loop();
+		this.setup();
+	}
+
+	setup() {
 	}
 
 	draw() {
@@ -156,10 +184,15 @@ export class Processing extends Component {
 	}
 
 	render() {
+		const sketch = this.draw();
+		const { props: { width, height } } = sketch;
+
 		this.frameCount += 1;
+		this.width = width;
+		this.height = height;
 
 		return cloneElement(
-			this.draw(),
+			sketch,
 			{
 				onMouseDown: this._onMouseDown,
 				onMouseMove: this._onMouseMove,
@@ -169,8 +202,27 @@ export class Processing extends Component {
 	}
 
 	@autobind
-	_frame() {
-		this.forceUpdate(() => setTimeout(this._frame, 1));
+	_loop() {
+		const { _canLoop } = this;
+
+		if (_canLoop) {
+			this.forceUpdate(() => setTimeout(this._loop, 1));
+		} else {
+			setTimeout(this._loop, 1);
+		}
+	}
+
+	@autobind
+	loop() {
+		this._canLoop = true;
+	}
+
+	noLoop() {
+		this._canLoop = false;
+	}
+
+	redraw() {
+		this.forceUpdate();
 	}
 
 	@autobind
@@ -206,10 +258,8 @@ export class Processing extends Component {
 	 * @param {any[]} args
 	 */
 	_execf(key, ...args) {
-		const f = this[key];
-
-		if (typeof f === 'function') {
-			f(...args);
+		if (typeof this[key] === 'function') {
+			this[key](...args);
 		}
 	}
 }
