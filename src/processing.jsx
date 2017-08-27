@@ -1,5 +1,5 @@
 import React, { Component, cloneElement, Children } from 'react';
-import { render as reactRender, findDOMNode } from 'react-dom';
+import findDOMNode from 'react-dom/lib/findDOMNode';
 import autobind from 'autobind-decorator';
 
 /**
@@ -227,5 +227,3 @@ export class Processing extends Component {
 		}
 	}
 }
-
-export const render = reactRender;

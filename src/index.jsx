@@ -1,5 +1,6 @@
 import React from 'react';
-import { Processing, Sketch, Ellipse, Background, color, render } from './processing';
+import { render } from 'react-dom';
+import { Processing, Sketch, Ellipse, Background, color } from './processing';
 
 class App extends Processing {
 	draw() {
