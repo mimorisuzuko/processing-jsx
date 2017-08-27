@@ -147,21 +147,14 @@ export class Sketch extends Component {
 			</canvas>
 		);
 	}
-
-	static get defaultProps() {
-		return {
-			width: 100,
-			height: 100
-		};
-	}
 }
 
 export class Processing extends Component {
 	constructor() {
 		super();
 
-		this.width = 0;
-		this.height = 0;
+		this.width = 100;
+		this.height = 100;
 		this.pmouseX = 0;
 		this.pmouseY = 0;
 		this.mouseX = 0;
@@ -169,6 +162,10 @@ export class Processing extends Component {
 		this.frameCount = 0;
 		this.isMousePressed = false;
 		this._canLoop = true;
+		this._delay = 0;
+		this.frameRate = 0;
+		this._idealFrameRate = 1000 / 60;
+		this._prevTime = Date.now();
 	}
 
 	componentDidMount() {
@@ -184,32 +181,60 @@ export class Processing extends Component {
 	}
 
 	render() {
+		const { width, height } = this;
 		const sketch = this.draw();
-		const { props: { width, height } } = sketch;
 
 		this.frameCount += 1;
-		this.width = width;
-		this.height = height;
 
 		return cloneElement(
 			sketch,
 			{
 				onMouseDown: this._onMouseDown,
 				onMouseMove: this._onMouseMove,
-				onMouseUp: this._onMouseUp
+				onMouseUp: this._onMouseUp,
+				width,
+				height
 			}
 		);
 	}
 
 	@autobind
 	_loop() {
-		const { _canLoop } = this;
+		const { _canLoop, _delay, _idealFrameRate, _prevTime } = this;
+		const now = Date.now();
+
+		this.frameRate = 1000 / (now - _prevTime);
+		this._delay = 0;
+		this._prevTime = now;
 
 		if (_canLoop) {
-			this.forceUpdate(() => setTimeout(this._loop, 1));
+			this.forceUpdate(() => setTimeout(this._loop, _idealFrameRate + _delay));
 		} else {
-			setTimeout(this._loop, 1);
+			setTimeout(this._loop, _idealFrameRate + _delay);
 		}
+	}
+
+	/**
+	 * @param {number} ms
+	 */
+	delay(ms) {
+		this._delay += ms;
+	}
+
+	/**
+	 * @param {number} fps
+	 */
+	setFrameRate(fps) {
+		this._idealFrameRate = 1000 / fps;
+	}
+
+	/**
+	 * @param {number} width 
+	 * @param {number} height 
+	 */
+	size(width, height) {
+		this.width = width;
+		this.height = height;
 	}
 
 	@autobind
