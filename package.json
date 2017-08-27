@@ -1,7 +1,7 @@
 {
 	"name": "processing-jsx",
 	"version": "0.0.1",
-	"description": "Your Sketch is Your React",
+	"description": "Your Sketch with Your React",
 	"main": "src/processing.jsx",
 	"scripts": {
 		"webpack": "./node_modules/.bin/webpack --config webpack.config.babel.js",

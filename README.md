@@ -1,6 +1,6 @@
 # Processing.jsx
 
-Your Sketch is Your React.
+Your Sketch with Your React.
 
 ## [Example](https://mimorisuzuko.github.io/processing-jsx)
 
