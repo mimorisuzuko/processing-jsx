@@ -2,6 +2,16 @@ import React, { Component, cloneElement, Children } from 'react';
 import findDOMNode from 'react-dom/lib/findDOMNode';
 import autobind from 'autobind-decorator';
 
+export const CORNER = 0;
+export const CORNERS = 1;
+export const RADIUS = 2;
+export const CENTER = 3;
+export const MITER = 8;
+export const BEVEL = 32;
+export const ROUND = 2;
+export const SQUARE = 1;
+export const PROJECT = 4;
+
 /**
  * @param {number[]} args
  * @returns {string}
@@ -23,24 +33,116 @@ export const color = (...args) => {
 	}
 };
 
+export class Rect extends Component {
+	render() {
+		const { props: { fill, stroke, strokeWeight, $canvas, radius, mode, strokeJoin, strokeCap } } = this;
+		let { props: { x, y, width, height, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius } } = this;
+		const context = $canvas.getContext('2d');
+
+		if (radius > 0) {
+			topLeftRadius = radius;
+			topRightRadius = radius;
+			bottomLeftRadius = radius;
+			bottomRightRadius = radius;
+		}
+
+		switch (mode) {
+			case CORNERS:
+				width = width - x;
+				height = height - y;
+				break;
+			case RADIUS:
+				width *= 2;
+				height *= 2;
+				x -= width / 2;
+				y -= height / 2;
+				break;
+			case CENTER:
+				x -= width / 2;
+				y -= height / 2;
+				break;
+			default:
+				break;
+		}
+
+		context.beginPath();
+		switch (strokeJoin) {
+			case BEVEL:
+				context.lineJoin = 'bevel';
+				break;
+			case ROUND:
+				context.lineJoin = 'round';
+				break;
+			default:
+				context.lineJoin = 'miter';
+				break;
+		}
+		switch (strokeCap) {
+			case SQUARE:
+				context.lineCap = 'butt';
+				break;
+			case PROJECT:
+				context.lineCap = 'square';
+				break;
+			default:
+				context.lineCap = 'round';
+				break;
+		}
+		context.fillStyle = fill;
+		context.strokeStyle = stroke;
+		context.lineWidth = strokeWeight;
+		context.moveTo(x + topLeftRadius, y);
+		context.lineTo(x + width - topRightRadius, y);
+		context.quadraticCurveTo(x + width, y, x + width, y + topRightRadius);
+		context.lineTo(x + width, y + height - bottomRightRadius);
+		context.quadraticCurveTo(x + width, y + height, x + width - bottomRightRadius, y + height);
+		context.lineTo(x + bottomLeftRadius, y + height);
+		context.quadraticCurveTo(x, y + height, x, y + height - bottomLeftRadius);
+		context.lineTo(x, y + topLeftRadius);
+		context.quadraticCurveTo(x, y, x + topLeftRadius, y);
+		context.fill();
+		context.stroke();
+		context.closePath();
+
+		return null;
+	}
+
+	static get defaultProps() {
+		return {
+			fill: color(255),
+			stroke: color(0),
+			strokeWeight: 1,
+			radius: 0,
+			topLeftRadius: 0,
+			topRightRadius: 0,
+			bottomLeftRadius: 0,
+			bottomRightRadius: 0,
+			strokeJoin: MITER
+		};
+	}
+}
+
 export class Line extends Component {
 	render() {
 		const { props: { x1, y1, x2, y2, stroke, strokeWeight, $canvas } } = this;
 		const context = $canvas.getContext('2d');
 
 		context.beginPath();
-		if (typeof stroke === 'string') {
-			context.strokeStyle = stroke;
-		}
-		if (typeof strokeWeight === 'number') {
-			context.lineWidth = strokeWeight;
-		}
+		context.strokeStyle = stroke;
+		context.lineWidth = strokeWeight;
 		context.moveTo(x1, y1);
 		context.lineTo(x2, y2);
 		context.stroke();
 		context.closePath();
 
 		return null;
+	}
+
+	static get defaultProps() {
+		return {
+			stroke: color(0),
+			strokeWeight: 1
+		};
 	}
 }
 
@@ -55,13 +157,18 @@ export class Background extends Component {
 
 		return null;
 	}
+
+	static get defaultProps() {
+		return {
+			color: color(204)
+		};
+	}
 }
 
 export class Ellipse extends Component {
 	render() {
-		const { props: { x, y, width, height, fill, stroke, mode, strokeWeight, $canvas } } = this;
+		const { props: { x, y, width, height, fill, stroke, mode, strokeWeight, $canvas, strokeJoin, strokeCap } } = this;
 		const context = $canvas.getContext('2d');
-		const { CORNER, CORNERS, RADIUS } = Ellipse;
 		let cx = x;
 		let cy = y;
 		let rx = width / 2;
@@ -89,6 +196,28 @@ export class Ellipse extends Component {
 		}
 
 		context.beginPath();
+		switch (strokeJoin) {
+			case BEVEL:
+				context.lineJoin = 'bevel';
+				break;
+			case ROUND:
+				context.lineJoin = 'round';
+				break;
+			default:
+				context.lineJoin = 'miter';
+				break;
+		}
+		switch (strokeCap) {
+			case SQUARE:
+				context.lineCap = 'butt';
+				break;
+			case PROJECT:
+				context.lineCap = 'square';
+				break;
+			default:
+				context.lineCap = 'round';
+				break;
+		}
 		context.fillStyle = fill;
 		context.strokeStyle = stroke;
 		context.lineWidth = strokeWeight;
@@ -104,24 +233,9 @@ export class Ellipse extends Component {
 		return {
 			fill: color(255),
 			stroke: color(0),
-			strokeWeight: 1
+			strokeWeight: 1,
+			strokeJoin: MITER
 		};
-	}
-
-	static get CORNER() {
-		return 0;
-	}
-
-	static get CORNERS() {
-		return 1;
-	}
-
-	static get RADIUS() {
-		return 2;
-	}
-
-	static get CENTER() {
-		return 3;
 	}
 }
 
