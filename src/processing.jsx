@@ -236,21 +236,8 @@ export class Ellipse extends Component {
 }
 
 export class Sketch extends Component {
-	constructor() {
-		super();
-
-		this.$canvas = null;
-		this.context2d = null;
-	}
-
-	componentDidMount() {
-		const $c = findDOMNode(this);
-		this.$canvas = $c;
-		this.context2d = $c.getContext('2d');
-	}
-
 	render() {
-		const { props: { width, height, children, onMouseDown, onMouseMove, onMouseUp }, $canvas, context2d } = this;
+		const { props: { width, height, children, onMouseDown, onMouseMove, onMouseUp, $canvas, context2d } } = this;
 
 		return (
 			<canvas width={width} height={height} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} style={{
@@ -279,9 +266,15 @@ export class Processing extends Component {
 		this.frameRate = 0;
 		this._idealFrameRate = 1000 / 60;
 		this._prevTime = Date.now();
+		this._$canvas = null;
+		this._context2d = null;
 	}
 
 	componentDidMount() {
+		const $c = findDOMNode(this);
+
+		this._$canvas = $c;
+		this._context2d = $c.getContext('2d');
 		this._loop();
 		this.setup();
 	}
@@ -294,7 +287,7 @@ export class Processing extends Component {
 	}
 
 	render() {
-		const { width, height } = this;
+		const { width, height, _$canvas, _context2d } = this;
 		const sketch = this.draw();
 
 		this.frameCount += 1;
@@ -306,7 +299,9 @@ export class Processing extends Component {
 				onMouseMove: this._onMouseMove,
 				onMouseUp: this._onMouseUp,
 				width,
-				height
+				height,
+				$canvas: _$canvas,
+				context2d: _context2d
 			}
 		);
 	}
@@ -361,6 +356,26 @@ export class Processing extends Component {
 
 	redraw() {
 		this.forceUpdate();
+	}
+
+	clear() {
+		const { _$canvas: { width, height }, _context2d } = this;
+
+		_context2d.clearRect(0, 0, width, height);
+	}
+
+	/**
+	 * @returns {string}
+	 */
+	noStroke() {
+		return 'none';
+	}
+
+	/**
+	 * @returns {string}
+	 */
+	noFill() {
+		return 'none';
 	}
 
 	@autobind
