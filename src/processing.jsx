@@ -35,9 +35,8 @@ export const color = (...args) => {
 
 export class Rect extends Component {
 	render() {
-		const { props: { fill, stroke, strokeWeight, $canvas, radius, mode, strokeJoin, strokeCap } } = this;
+		const { props: { fill, stroke, strokeWeight, context2d, radius, mode, strokeJoin, strokeCap } } = this;
 		let { props: { x, y, width, height, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius } } = this;
-		const context = $canvas.getContext('2d');
 
 		if (radius > 0) {
 			topLeftRadius = radius;
@@ -65,44 +64,44 @@ export class Rect extends Component {
 				break;
 		}
 
-		context.beginPath();
+		context2d.beginPath();
 		switch (strokeJoin) {
 			case BEVEL:
-				context.lineJoin = 'bevel';
+				context2d.lineJoin = 'bevel';
 				break;
 			case ROUND:
-				context.lineJoin = 'round';
+				context2d.lineJoin = 'round';
 				break;
 			default:
-				context.lineJoin = 'miter';
+				context2d.lineJoin = 'miter';
 				break;
 		}
 		switch (strokeCap) {
 			case SQUARE:
-				context.lineCap = 'butt';
+				context2d.lineCap = 'butt';
 				break;
 			case PROJECT:
-				context.lineCap = 'square';
+				context2d.lineCap = 'square';
 				break;
 			default:
-				context.lineCap = 'round';
+				context2d.lineCap = 'round';
 				break;
 		}
-		context.fillStyle = fill;
-		context.strokeStyle = stroke;
-		context.lineWidth = strokeWeight;
-		context.moveTo(x + topLeftRadius, y);
-		context.lineTo(x + width - topRightRadius, y);
-		context.quadraticCurveTo(x + width, y, x + width, y + topRightRadius);
-		context.lineTo(x + width, y + height - bottomRightRadius);
-		context.quadraticCurveTo(x + width, y + height, x + width - bottomRightRadius, y + height);
-		context.lineTo(x + bottomLeftRadius, y + height);
-		context.quadraticCurveTo(x, y + height, x, y + height - bottomLeftRadius);
-		context.lineTo(x, y + topLeftRadius);
-		context.quadraticCurveTo(x, y, x + topLeftRadius, y);
-		context.fill();
-		context.stroke();
-		context.closePath();
+		context2d.fillStyle = fill;
+		context2d.strokeStyle = stroke;
+		context2d.lineWidth = strokeWeight;
+		context2d.moveTo(x + topLeftRadius, y);
+		context2d.lineTo(x + width - topRightRadius, y);
+		context2d.quadraticCurveTo(x + width, y, x + width, y + topRightRadius);
+		context2d.lineTo(x + width, y + height - bottomRightRadius);
+		context2d.quadraticCurveTo(x + width, y + height, x + width - bottomRightRadius, y + height);
+		context2d.lineTo(x + bottomLeftRadius, y + height);
+		context2d.quadraticCurveTo(x, y + height, x, y + height - bottomLeftRadius);
+		context2d.lineTo(x, y + topLeftRadius);
+		context2d.quadraticCurveTo(x, y, x + topLeftRadius, y);
+		context2d.fill();
+		context2d.stroke();
+		context2d.closePath();
 
 		return null;
 	}
@@ -124,16 +123,15 @@ export class Rect extends Component {
 
 export class Line extends Component {
 	render() {
-		const { props: { x1, y1, x2, y2, stroke, strokeWeight, $canvas } } = this;
-		const context = $canvas.getContext('2d');
+		const { props: { x1, y1, x2, y2, stroke, strokeWeight, context2d } } = this;
 
-		context.beginPath();
-		context.strokeStyle = stroke;
-		context.lineWidth = strokeWeight;
-		context.moveTo(x1, y1);
-		context.lineTo(x2, y2);
-		context.stroke();
-		context.closePath();
+		context2d.beginPath();
+		context2d.strokeStyle = stroke;
+		context2d.lineWidth = strokeWeight;
+		context2d.moveTo(x1, y1);
+		context2d.lineTo(x2, y2);
+		context2d.stroke();
+		context2d.closePath();
 
 		return null;
 	}
@@ -148,12 +146,11 @@ export class Line extends Component {
 
 export class Background extends Component {
 	render() {
-		const { props: { color, $canvas } } = this;
+		const { props: { color, $canvas, context2d } } = this;
 		const { width, height } = $canvas;
-		const context = $canvas.getContext('2d');
 
-		context.fillStyle = color;
-		context.fillRect(0, 0, width, height);
+		context2d.fillStyle = color;
+		context2d.fillRect(0, 0, width, height);
 
 		return null;
 	}
@@ -167,8 +164,7 @@ export class Background extends Component {
 
 export class Ellipse extends Component {
 	render() {
-		const { props: { x, y, width, height, fill, stroke, mode, strokeWeight, $canvas, strokeJoin, strokeCap } } = this;
-		const context = $canvas.getContext('2d');
+		const { props: { x, y, width, height, fill, stroke, mode, strokeWeight, context2d, strokeJoin, strokeCap } } = this;
 		let cx = x;
 		let cy = y;
 		let rx = width / 2;
@@ -195,36 +191,36 @@ export class Ellipse extends Component {
 				break;
 		}
 
-		context.beginPath();
+		context2d.beginPath();
 		switch (strokeJoin) {
 			case BEVEL:
-				context.lineJoin = 'bevel';
+				context2d.lineJoin = 'bevel';
 				break;
 			case ROUND:
-				context.lineJoin = 'round';
+				context2d.lineJoin = 'round';
 				break;
 			default:
-				context.lineJoin = 'miter';
+				context2d.lineJoin = 'miter';
 				break;
 		}
 		switch (strokeCap) {
 			case SQUARE:
-				context.lineCap = 'butt';
+				context2d.lineCap = 'butt';
 				break;
 			case PROJECT:
-				context.lineCap = 'square';
+				context2d.lineCap = 'square';
 				break;
 			default:
-				context.lineCap = 'round';
+				context2d.lineCap = 'round';
 				break;
 		}
-		context.fillStyle = fill;
-		context.strokeStyle = stroke;
-		context.lineWidth = strokeWeight;
-		context.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
-		context.fill();
-		context.stroke();
-		context.closePath();
+		context2d.fillStyle = fill;
+		context2d.strokeStyle = stroke;
+		context2d.lineWidth = strokeWeight;
+		context2d.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
+		context2d.fill();
+		context2d.stroke();
+		context2d.closePath();
 
 		return null;
 	}
@@ -244,20 +240,23 @@ export class Sketch extends Component {
 		super();
 
 		this.$canvas = null;
+		this.context2d = null;
 	}
 
 	componentDidMount() {
-		this.$canvas = findDOMNode(this);
+		const $c = findDOMNode(this);
+		this.$canvas = $c;
+		this.context2d = $c.getContext('2d');
 	}
 
 	render() {
-		const { props: { width, height, children, onMouseDown, onMouseMove, onMouseUp }, $canvas } = this;
+		const { props: { width, height, children, onMouseDown, onMouseMove, onMouseUp }, $canvas, context2d } = this;
 
 		return (
 			<canvas width={width} height={height} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} style={{
 				backgroundColor: color(204)
 			}}>
-				{$canvas ? Children.map(children, (child) => cloneElement(child, { $canvas })) : null}
+				{$canvas ? Children.map(children, (child) => cloneElement(child, { $canvas, context2d })) : null}
 			</canvas>
 		);
 	}
